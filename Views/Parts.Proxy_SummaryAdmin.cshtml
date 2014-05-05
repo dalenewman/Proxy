@@ -1,0 +1,7 @@
+@using Proxy.Models
+@{
+    var part = (ProxyPart) Model.Part;
+}
+Use 
+<a href="@Url.Content(string.Format("~/Proxy/{0}",part.Id))" target="_blank">@Url.Content(string.Format("~/Proxy/{0}", part.Id))</a> 
+to access <a href="@part.ServiceUrl" target="_blank">@part.ServiceUrl</a>.

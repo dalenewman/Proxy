@@ -1,0 +1,12 @@
+﻿Name: Proxy
+AntiForgery: disabled
+Author: Dale Newman
+Website: https://github.com/dalenewman
+Version: 0.0.4
+OrchardVersion: 1.7.1
+Description: A proxy for accessing private resources.
+Dependencies: Orchard.ContentPermissions
+Features:
+    Proxy:
+        Description: A proxy for accessing private resources.
+		Category: Security
