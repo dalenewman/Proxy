@@ -21,6 +21,7 @@ namespace Proxy.Controllers {
             T = NullLocalizer.Instance;
         }
 
+        [AcceptVerbs("GET", "HEAD", "POST", "PUT", "DELETE")]
         public ActionResult Index(int proxyId) {
             _proxy = _services.ContentManager.Get(proxyId).As<ProxyPart>();
 
