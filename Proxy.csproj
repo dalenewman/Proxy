@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ProxyController.cs" />
+    <Compile Include="Controllers\TokenPassThroughProviderFactory.cs" />
     <Compile Include="Drivers\ProxyPartDriver.cs" />
     <Compile Include="Handlers\ProxyPartHandler.cs" />
     <Compile Include="Models\ProxyPart.cs" />
@@ -98,6 +99,7 @@
   <ItemGroup>
     <Content Include="LICENSE.md" />
     <None Include="Properties\PublishProfiles\local.pubxml" />
+    <Content Include="README.md" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
