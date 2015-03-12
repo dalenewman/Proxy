@@ -81,6 +81,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\MimeTypes.cs" />
     <Compile Include="Controllers\ProxyController.cs" />
     <Compile Include="Controllers\TokenPassThroughProviderFactory.cs" />
     <Compile Include="Drivers\ProxyPartDriver.cs" />

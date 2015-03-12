@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
 using Orchard;
 using Orchard.ContentManagement;
@@ -71,7 +71,7 @@ namespace Proxy.Controllers {
 
             var url = _proxyTrimmer.Replace(HttpContext.Request.Url.PathAndQuery, string.Empty);
 
-            RelayContent(CombinePath(_proxy.ServiceUrl, url));
+            RelayContent(CombinePath(_proxy.ServiceUrl, url), Request, Response, Logger);
         }
 
         private static string CombinePath(string proxyUrl, string requestedUrl) {
@@ -81,20 +81,25 @@ namespace Proxy.Controllers {
             return proxyUrl + requestedUrl;
         }
 
-        private void RelayContent(string url) {
+        private static void RelayContent(
+            string url, 
+            HttpRequestBase request, 
+            HttpResponseBase response,
+            ILogger logger
+        ) {
 
-            var orchardRequest = Request;
-            var serviceRequest = WebRequest.Create(url);
+            var uri = new Uri(url);
+            var serviceRequest = WebRequest.Create(uri);
 
-            serviceRequest.Method = orchardRequest.HttpMethod;
-            serviceRequest.ContentType = orchardRequest.ContentType;
+            serviceRequest.Method = request.HttpMethod;
+            serviceRequest.ContentType = request.ContentType;
 
             //pull in input
             if (serviceRequest.Method != "GET") {
 
-                orchardRequest.InputStream.Position = 0;
+                request.InputStream.Position = 0;
 
-                var inStream = orchardRequest.InputStream;
+                var inStream = request.InputStream;
                 Stream webStream = null;
                 try {
                     //copy incoming request body to outgoing request
@@ -111,35 +116,33 @@ namespace Proxy.Controllers {
                 }
             }
 
-            //get and push out output
+            //get and push output
             try {
-                using (var resourceResponse = (HttpWebResponse) serviceRequest.GetResponse()) {
+                using (var resourceResponse = (HttpWebResponse)serviceRequest.GetResponse()) {
                     using (var resourceStream = resourceResponse.GetResponseStream()) {
-                        resourceStream.CopyTo(Response.OutputStream);
+                        resourceStream.CopyTo(response.OutputStream);
                     }
-                    Response.ContentType = resourceResponse.ContentType;
+                    response.ContentType = uri.IsFile ? MimeTypeMap.GetMimeType(Path.GetExtension(uri.LocalPath)) : resourceResponse.ContentType;
                 }
-            }
-            catch (WebException ex) {
+            } catch (WebException ex) {
                 if (ex.Status == WebExceptionStatus.ProtocolError) {
-                    var response = ex.Response as HttpWebResponse;
-                    if (response != null) {
-                        Response.StatusCode = (int)response.StatusCode;
-                        Response.ContentType = response.ContentType;
+                    var resourceResponse = ex.Response as HttpWebResponse;
+                    if (resourceResponse != null) {
+                        response.StatusCode = (int)resourceResponse.StatusCode;
+                        response.ContentType = resourceResponse.ContentType;
                     } else {
-                        Response.StatusCode = 500;
-                        Response.ContentType = ex.Response.ContentType;
-                        Logger.Error(ex, "Proxy module protocol error: {0}", ex.Message);
-
+                        response.StatusCode = 500;
+                        response.ContentType = ex.Response.ContentType;
+                        logger.Error(ex, "Proxy module protocol error: {0}", ex.Message);
                     }
                 } else {
-                    Response.StatusCode = 500;
-                    Response.ContentType = ex.Response.ContentType;
-                    Logger.Error(ex, "Proxy module error: {0}", ex.Message);
+                    response.StatusCode = 500;
+                    response.ContentType = ex.Response.ContentType;
+                    logger.Error(ex, "Proxy module error: {0}", ex.Message);
                 }
             } finally {
-                Response.Flush();
-                Response.End();
+                response.Flush();
+                response.End();
             }
         }
     }
