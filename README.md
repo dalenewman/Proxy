@@ -54,23 +54,42 @@ You could grab a javascript library like [ajax-solr](https://github.com/evolving
 and start searching on your website.  One problem though, you 
 probably shouldn't expose your SOLR instance to _the entire world_.
 
-####Secure SOLR
+####Securing SOLR
 
 You can secure it by creating a proxy for it with this module.
 
-![Create SOLR Proxy](Content/ReadMe/Proxy1.png "Create SOLR Proxy")
+![Create SOLR Proxy](Content/ReadMe/ProxyCreate.png "Create SOLR Proxy")
 
-###PUT, DELETE
+Enable _Content Item Permissions_, check `Authenticated`, and save it.  Then, you should see it in your content items:
 
-If the service you need to proxy requires `PUT` and/or `DELETE`
-methods, you have to make some changes to _web.config_.
+![Proxy Created](Content/ReadMe/ProxyCreated.png "Proxy Created")
 
-####Web.Config Adjustments
+Now, instead of accessing SOLR directly, you can access it 
+through your proxy:
 
-#####WebDAV
+<pre class="prettyprint" lang="bash">
+http://<strong>www.YourOrchardCms.com</strong>/Proxy/8090/select?q=*:*&wt=json&rows=2&fl=orderdetailsorderid,ordersorderdate,ordersfreight,productsunitprice,productsproductname,productsdiscontinued
+</pre>
 
-Unfortunately, a [WebDAV](http://en.wikipedia.org/wiki/WebDAV) 
+Orchard's _Content Item Permission_ is only allowing 
+authenticated users access to it.  If I logout and try to access 
+it, it will give me a [401](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2):
+
+![Proxy Returns 401](Content/ReadMe/ProxyDeniesAccess.png "Proxy Says No!")
+
+###Advanced
+
+So far, I've found two situations that require _web.config_ 
+changes.
+
+1. resource requires `PUT` and/or `DELETE` methods
+2. resource uses funny characters on the request path
+
+#####Allow PUT, and DELETE
+
+Unfortunately, an IIS [WebDAV](http://en.wikipedia.org/wiki/WebDAV) 
 module and handler interfer with `PUT`, and `DELETE` requests.
+
 So, if you want to allow `PUT` and `DELETE` through 
 your proxy, you have to opt-out of WebDAV. This is done 
 by modifying Orchard's _web.config_.
@@ -89,17 +108,16 @@ by modifying Orchard's _web.config_.
 &lt;/handlers&gt;
 </pre>
 
-#####Invalid Path Characters
+#####Allow Characters in Request Path
 
-By default, ASP.NET considers some characters in 
-a path to be invalid. These characters are `<`, `>`, `*`, `%`, `:`, and `&`.
+By default, ASP.NET considers some characters in a request 
+path to be invalid. These characters are `<`, `>`, `*`, `%`, `:`, and `&`.
 
-If your proxied resource paths require any of these 
+If your proxied resource relies on any of these 
 characters, you may need to edit `requestPathInvalidCharacters` 
 in `httpRuntime`.
 
-The example below 
-has the default invalid characters, 
+The example below has the default invalid characters, 
 minus the `*` character.
 
 <pre class="prettyprint" lang="xml">
