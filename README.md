@@ -58,7 +58,7 @@ probably shouldn't expose your SOLR instance to _the entire world_.
 
 You can secure it by creating a proxy for it with this module.
 
-![Create SOLR Proxy](Content/ReadMe/Proxy1.jpg "Create SOLR Proxy")
+![Create SOLR Proxy](Content/ReadMe/Proxy1.png "Create SOLR Proxy")
 
 ###PUT, DELETE
 
