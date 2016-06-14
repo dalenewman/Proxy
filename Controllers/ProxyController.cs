@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -14,6 +15,24 @@ using Proxy.Models;
 namespace Proxy.Controllers {
 
     public class ProxyController : Controller {
+
+        private static readonly HashSet<string> _restrictedHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+            "Accept",
+            "Accept-Encoding",
+            "Accept-Language",
+            "Connection",
+            "Content-Length",
+            "Content-Type",
+            "Date",
+            "Expect",
+            "Host",
+            "If-Modified-Since",
+            "Range",
+            "Referer",
+            "Transfer-Encoding",
+            "User-Agent",
+            "Proxy-Connection"
+        };
 
         private static bool _replacedJsonProvider;
         private static Regex _proxyTrimmer;
@@ -71,7 +90,7 @@ namespace Proxy.Controllers {
 
             var url = _proxyTrimmer.Replace(HttpContext.Request.Url.PathAndQuery, string.Empty);
 
-            RelayContent(CombinePath(_proxy.ServiceUrl, url), Request, Response, Logger);
+            RelayContent(CombinePath(_proxy.ServiceUrl, url), Request, Response, Logger, _proxy.ForwardHeaders);
         }
 
         private static string CombinePath(string proxyUrl, string requestedUrl) {
@@ -82,10 +101,11 @@ namespace Proxy.Controllers {
         }
 
         private static void RelayContent(
-            string url, 
-            HttpRequestBase request, 
+            string url,
+            HttpRequestBase request,
             HttpResponseBase response,
-            ILogger logger
+            ILogger logger,
+            bool forwardHeaders
         ) {
 
             var uri = new Uri(url);
@@ -93,6 +113,12 @@ namespace Proxy.Controllers {
 
             serviceRequest.Method = request.HttpMethod;
             serviceRequest.ContentType = request.ContentType;
+
+            if (forwardHeaders) {
+                foreach (var key in request.Headers.AllKeys.Where(key => !_restrictedHeaders.Contains(key))) {
+                    serviceRequest.Headers.Add(key, request.Headers[key]);
+                }
+            }
 
             //pull in input
             if (serviceRequest.Method != "GET") {

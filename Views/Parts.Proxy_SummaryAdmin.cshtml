@@ -1,8 +1,12 @@
 @using Proxy.Models
 @{
     var part = (ProxyPart) Model.Part;
-    var trailingSlash = part.ServiceUrl.EndsWith("/") ? "/" : "";
+    var url = string.Empty;
+    var service = string.Empty;
+    if (part != null) {
+        var trailingSlash = part.ServiceUrl.EndsWith("/") ? "/" : "";
+        url = Url.Content(string.Format("~/Proxy/{0}{1}", part.Id, trailingSlash));
+        service = part.ServiceUrl;
+    }
 }
-Use 
-<a href="@Url.Content(string.Format("~/Proxy/{0}{1}",part.Id, trailingSlash))" target="_blank">@Url.Content(string.Format("~/Proxy/{0}{1}", part.Id, trailingSlash))</a> 
-to access <a href="@part.ServiceUrl" target="_blank">@part.ServiceUrl</a>.
+Use <a href="@url" target="_blank">@url</a> to access <a href="@service" target="_blank">@service</a>.

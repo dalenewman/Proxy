@@ -6,6 +6,8 @@ namespace Proxy.Models {
 
         [StringLength(255)]
         public virtual string ServiceUrl { get; set; }
+
+        public virtual bool ForwardHeaders { get; set; }
         
     }
 }

@@ -5,4 +5,10 @@
     @Html.TextBoxFor(x => x.ServiceUrl , new { @class = "large text" })
     @Html.ValidationMessageFor(x => x.ServiceUrl)
 </div>
-<div class="hint">@T("Service url (e.g. http://192.168.1.1:8983/solr/core)")</div>
+<div class="hint">@T("Service url (e.g. http://localhost:5601)")</div>
+
+<div>
+    @Html.EditorFor(m => m.ForwardHeaders)
+    <label class="forcheckbox" for="@Html.FieldIdFor(m => m.ForwardHeaders)">@T("Forward Headers")</label>
+    <span class="hint">@T("Forward non-restricted headers.")</span>
+</div>

@@ -55,5 +55,14 @@ namespace Proxy {
             return 1;
         }
 
+        public int UpdateFrom1() {
+            SchemaBuilder.AlterTable("ProxyPartRecord",
+                table => table
+                    .AddColumn("ForwardHeaders", DbType.Boolean));
+
+            return 2;
+        }
+
+
     }
 }

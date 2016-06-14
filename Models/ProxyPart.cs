@@ -8,8 +8,13 @@ namespace Proxy.Models {
             set { Record.ServiceUrl = value; }
         }
 
+        public bool ForwardHeaders {
+            get { return Record.ForwardHeaders; }
+            set { Record.ForwardHeaders = value; }
+        }
+
         public bool IsValid() {
-            return !String.IsNullOrEmpty(ServiceUrl);
+            return !string.IsNullOrEmpty(ServiceUrl);
         }
     }
 }
