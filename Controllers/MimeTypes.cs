@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Proxy.Controllers {
 
 
-    /// <summary>
-    /// https://github.com/samuelneff/MimeTypeMap
-    /// </summary>
-    public static class MimeTypeMap {
+   /// <summary>
+   /// https://github.com/samuelneff/MimeTypeMap
+   /// </summary>
+   public static class MimeTypeMap {
 
-        private static readonly IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
+      private static readonly IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
 
         // combination of values from Windows 7 Registry and 
         // from C:\Windows\System32\inetsrv\config\applicationHost.config
@@ -578,18 +578,18 @@ namespace Proxy.Controllers {
         {".zip", "application/x-zip-compressed"},
         };
 
-        public static string GetMimeType(string extension) {
-            if (extension == null) {
-                throw new ArgumentNullException("extension");
-            }
+      public static string GetMimeType(string extension) {
+         if (extension == null) {
+            return "application/octet-stream";
+         }
 
-            if (!extension.StartsWith(".")) {
-                extension = "." + extension;
-            }
+         if (!extension.StartsWith(".")) {
+            extension = "." + extension;
+         }
 
-            string mime;
+         string mime;
 
-            return _mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
-        }
-    }
+         return _mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
+      }
+   }
 }

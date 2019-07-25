@@ -22,7 +22,6 @@ namespace Proxy {
                 new RouteValueDictionary {{"area", "Proxy"}},
                 new MvcRouteHandler()
             );
-            route.DataTokens.Add("IgnoreJSON", true);
 
             return new[] {
                 new RouteDescriptor {
